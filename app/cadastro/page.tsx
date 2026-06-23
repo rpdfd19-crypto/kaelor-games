@@ -7,47 +7,108 @@ import { useRouter } from 'next/navigation';
 export default function Cadastro() {
   const router = useRouter();
 
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
     senha: '',
-    confirmarSenha: ''
+    confirmarSenha: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (
+    e: React.FormEvent
+  ) => {
     e.preventDefault();
-    
+
     if (formData.senha !== formData.confirmarSenha) {
-      alert("As senhas não coincidem!");
+      alert('As senhas não coincidem!');
       return;
     }
 
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('userName', formData.nome);
+    if (formData.senha.length < 6) {
+      alert(
+        'A senha deve ter pelo menos 6 caracteres.'
+      );
+      return;
+    }
 
-    alert(`Conta criada com sucesso!\nBem-vindo(a), ${formData.nome}!`);
-    router.push('/catalogo');
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        '/api/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type':
+              'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.nome,
+            email: formData.email,
+            password: formData.senha,
+          }),
+        }
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        alert(
+          data.message ||
+            'Erro ao criar conta.'
+        );
+        return;
+      }
+
+      alert(
+        'Conta criada com sucesso!'
+      );
+
+      router.push('/login');
+    } catch {
+      alert(
+        'Erro ao criar conta.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <main className="min-h-screen bg-black text-white flex items-center justify-center py-12 px-6">
       <div className="max-w-md w-full">
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-purple-400 mb-3">KAELOR GAMES</h1>
-          <p className="text-zinc-400">Crie sua conta</p>
+          <h1 className="text-4xl font-bold text-purple-400 mb-3">
+            KAELOR GAMES
+          </h1>
+
+          <p className="text-zinc-400">
+            Crie sua conta
+          </p>
         </div>
 
         <div className="bg-zinc-900 rounded-3xl p-8 border border-zinc-800">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
             <div>
-              <label className="block text-sm text-zinc-400 mb-2">Nome completo</label>
+              <label className="block text-sm text-zinc-400 mb-2">
+                Nome completo
+              </label>
+
               <input
                 type="text"
                 name="nome"
@@ -60,7 +121,10 @@ export default function Cadastro() {
             </div>
 
             <div>
-              <label className="block text-sm text-zinc-400 mb-2">E-mail</label>
+              <label className="block text-sm text-zinc-400 mb-2">
+                E-mail
+              </label>
+
               <input
                 type="email"
                 name="email"
@@ -73,7 +137,10 @@ export default function Cadastro() {
             </div>
 
             <div>
-              <label className="block text-sm text-zinc-400 mb-2">Senha</label>
+              <label className="block text-sm text-zinc-400 mb-2">
+                Senha
+              </label>
+
               <input
                 type="password"
                 name="senha"
@@ -86,7 +153,10 @@ export default function Cadastro() {
             </div>
 
             <div>
-              <label className="block text-sm text-zinc-400 mb-2">Confirmar Senha</label>
+              <label className="block text-sm text-zinc-400 mb-2">
+                Confirmar Senha
+              </label>
+
               <input
                 type="password"
                 name="confirmarSenha"
@@ -100,13 +170,18 @@ export default function Cadastro() {
 
             <button
               type="submit"
-              className="w-full bg-purple-600 hover:bg-purple-700 py-3.5 rounded-2xl font-semibold text-lg transition"
+              disabled={loading}
+              className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 py-3.5 rounded-2xl font-semibold text-lg transition"
             >
-              Criar Conta
+              {loading
+                ? 'Criando conta...'
+                : 'Criar Conta'}
             </button>
           </form>
 
-          <div className="my-6 text-center text-zinc-500">ou</div>
+          <div className="my-6 text-center text-zinc-500">
+            ou
+          </div>
 
           <button className="w-full border border-zinc-700 hover:bg-zinc-800 py-3.5 rounded-2xl font-medium transition flex items-center justify-center gap-3">
             🌐 Cadastrar com Google
@@ -114,7 +189,10 @@ export default function Cadastro() {
 
           <p className="text-center mt-8 text-zinc-400">
             Já tem conta?{' '}
-            <Link href="/login" className="text-purple-400 hover:text-purple-300 font-medium">
+            <Link
+              href="/login"
+              className="text-purple-400 hover:text-purple-300 font-medium"
+            >
               Faça login
             </Link>
           </p>

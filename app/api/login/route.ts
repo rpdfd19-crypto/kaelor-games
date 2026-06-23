@@ -82,15 +82,16 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error) {
-    console.error(error);
+  console.error("LOGIN ERROR:", error);
 
-    return NextResponse.json(
-      {
-        message: "Erro interno",
-      },
-      {
-        status: 500,
-      }
-    );
+  return NextResponse.json(
+    {
+      message: "Erro interno",
+      error: String(error),
+    },
+    {
+      status: 500,
+    }
+  );
   }
 }

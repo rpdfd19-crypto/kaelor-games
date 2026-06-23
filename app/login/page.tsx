@@ -7,22 +7,8 @@ import { useRouter } from 'next/navigation';
 export default function Login() {
   const router = useRouter();
 
-  const [email, setEmail] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('lembrarEmail') || '';
-    }
-    return '';
-  });
-
+  const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-
-  const [lembrar, setLembrar] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('lembrarEmail') !== null;
-    }
-    return false;
-  });
-
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (
@@ -38,8 +24,7 @@ export default function Login() {
         {
           method: 'POST',
           headers: {
-            'Content-Type':
-              'application/json',
+            'Content-Type': 'application/json',
           },
           credentials: 'include',
           body: JSON.stringify({
@@ -49,8 +34,7 @@ export default function Login() {
         }
       );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         alert(
@@ -60,23 +44,10 @@ export default function Login() {
         return;
       }
 
-      if (lembrar) {
-        localStorage.setItem(
-          'lembrarEmail',
-          email
-        );
-      } else {
-        localStorage.removeItem(
-          'lembrarEmail'
-        );
-      }
-
       router.push('/catalogo');
       router.refresh();
     } catch {
-      alert(
-        'Erro ao realizar login.'
-      );
+      alert('Erro ao realizar login.');
     } finally {
       setLoading(false);
     }
@@ -109,9 +80,7 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) =>
-                  setEmail(
-                    e.target.value
-                  )
+                  setEmail(e.target.value)
                 }
                 className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500"
                 placeholder="seu@email.com"
@@ -128,9 +97,7 @@ export default function Login() {
                 type="password"
                 value={senha}
                 onChange={(e) =>
-                  setSenha(
-                    e.target.value
-                  )
+                  setSenha(e.target.value)
                 }
                 className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500"
                 placeholder="••••••••"
@@ -138,22 +105,7 @@ export default function Login() {
               />
             </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={lembrar}
-                  onChange={(e) =>
-                    setLembrar(
-                      e.target.checked
-                    )
-                  }
-                  className="accent-purple-600 w-4 h-4"
-                />
-
-                Lembrar de mim
-              </label>
-
+            <div className="flex justify-end text-sm">
               <Link
                 href="#"
                 className="text-purple-400 hover:text-purple-300"

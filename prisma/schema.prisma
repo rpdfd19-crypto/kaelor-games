@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -22,16 +22,16 @@ model User {
 }
 
 model Product {
-  id                Int      @id @default(autoincrement())
-  nome              String
-  descricao         String
-  preco             Float
-  precoPromocional  Float?
-  plataforma        String   @default("PC")
-  imagem            String?
-  visivel           Boolean  @default(true)
-  destaque          Boolean  @default(false)
-  estoque           Int      @default(0)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  nome             String
+  descricao        String
+  preco            Float
+  precoPromocional Float?
+  plataforma       String   @default("PC")
+  imagem           String?
+  visivel          Boolean  @default(true)
+  destaque         Boolean  @default(false)
+  estoque          Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }

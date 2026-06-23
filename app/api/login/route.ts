@@ -5,43 +5,28 @@ import jwt from "jsonwebtoken";
 
 export async function POST(req: Request) {
   try {
-    const {
-      email,
-      senha,
-      lembrar,
-    } = await req.json();
+    const { email, senha } = await req.json();
 
     const user = await prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email }
     });
 
     if (!user) {
       return NextResponse.json(
-        {
-          message: "Usuário não encontrado",
-        },
-        {
-          status: 401,
-        }
+        { message: "Usuário não encontrado" },
+        { status: 401 }
       );
     }
 
-    const validPassword =
-      await bcrypt.compare(
-        senha,
-        user.password
-      );
+    const validPassword = await bcrypt.compare(
+      senha,
+      user.password
+    );
 
     if (!validPassword) {
       return NextResponse.json(
-        {
-          message: "Senha inválida",
-        },
-        {
-          status: 401,
-        }
+        { message: "Senha inválida" },
+        { status: 401 }
       );
     }
 
@@ -52,46 +37,26 @@ export async function POST(req: Request) {
         role: user.role,
       },
       process.env.JWT_SECRET!,
-      {
-        expiresIn: lembrar
-          ? "30d"
-          : "1d",
-      }
+      { expiresIn: "7d" }
     );
 
-    const response =
-      NextResponse.json({
-        success: true,
-      });
+    const response = NextResponse.json({
+      success: true,
+    });
 
-    response.cookies.set(
-      "token",
-      token,
-      {
-        httpOnly: true,
-        secure:
-          process.env.NODE_ENV ===
-          "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: lembrar
-          ? 60 * 60 * 24 * 30
-          : 60 * 60 * 24,
-      }
-    );
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
 
     return response;
-  } catch (error) {
-  console.error("LOGIN ERROR:", error);
-
-  return NextResponse.json(
-    {
-      message: "Erro interno",
-      error: String(error),
-    },
-    {
-      status: 500,
-    }
-  );
+  } catch {
+    return NextResponse.json(
+      { message: "Erro interno" },
+      { status: 500 }
+    );
   }
 }
